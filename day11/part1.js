@@ -23,7 +23,7 @@ for (const monkey of data) {
     testDivisibleBy: testDivisibleBy,
     testTrue: testTrueThrowTo,
     testFalse: testFalseThrowTo,
-    itemsInspected: 0
+    itemsInspected: 0,
   }
 
   Object.assign(monkeys, newMonkey)
@@ -32,7 +32,6 @@ for (const monkey of data) {
 for (let round = 1; round <= ROUNDS; round++) {
   // each monkey takes one turn
   for (const monkey in monkeys) {
-
     const currentMonkey = monkeys[monkey]
     const items = currentMonkey.items
     const testDivisor = currentMonkey.testDivisibleBy
@@ -40,38 +39,43 @@ for (let round = 1; round <= ROUNDS; round++) {
     // if monkey has no items it's turn ends
     while (items.length > 0) {
       // each monkey inspects its items
-        let operationResult
-        const operation = currentMonkey.operation.replaceAll('old', items[0])
-        const operationType = operation.match(/[+*]/g)[0]
-        const operationNumbers = operation.match(/\d+/g).map(number => Number(number))
+      let operationResult
+      const operation = currentMonkey.operation.replaceAll('old', items[0])
+      const operationType = operation.match(/[+*]/g)[0]
+      const operationNumbers = operation
+        .match(/\d+/g)
+        .map(number => Number(number))
 
-        if (operationType === '+') {
-          operationResult = operationNumbers.reduce((acc, val) => acc + val, 0)
-        } else {
-          operationResult = operationNumbers.reduce((acc, val) => acc * val)
-        }
+      if (operationType === '+') {
+        operationResult = operationNumbers.reduce((acc, val) => acc + val, 0)
+      } else {
+        operationResult = operationNumbers.reduce((acc, val) => acc * val)
+      }
 
-        const divideResult = Math.floor(operationResult / 3)
-        const isDivisibleByTestDivisor = divideResult % testDivisor === 0
+      const divideResult = Math.floor(operationResult / 3)
+      const isDivisibleByTestDivisor = divideResult % testDivisor === 0
 
-        if (isDivisibleByTestDivisor) {
-          const destination = currentMonkey.testTrue
-          items.shift()
-          monkeys['monkey' + destination].items.push(divideResult)
-        } else {
-          const destination = currentMonkey.testFalse
-          items.shift()
-          monkeys['monkey' + destination].items.push(divideResult)
-        }
+      if (isDivisibleByTestDivisor) {
+        const destination = currentMonkey.testTrue
+        items.shift()
+        monkeys['monkey' + destination].items.push(divideResult)
+      } else {
+        const destination = currentMonkey.testFalse
+        items.shift()
+        monkeys['monkey' + destination].items.push(divideResult)
+      }
 
-        // increase number of inspected items
-        currentMonkey.itemsInspected++      
+      // increase number of inspected items
+      currentMonkey.itemsInspected++
     }
   }
 }
 
-const itemsInspectedSorted = Object.entries(monkeys).map(monkey => monkey[1].itemsInspected).sort((a, b) => b - a)
-const monkeyBusinessLevel = itemsInspectedSorted.slice(0, 2).reduce((acc, val) => acc * val)
-
+const itemsInspectedSorted = Object.entries(monkeys)
+  .map(monkey => monkey[1].itemsInspected)
+  .sort((a, b) => b - a)
+const monkeyBusinessLevel = itemsInspectedSorted
+  .slice(0, 2)
+  .reduce((acc, val) => acc * val)
 
 console.log(monkeyBusinessLevel)

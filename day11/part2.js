@@ -7,22 +7,15 @@ const monkeys = {}
 
 for (const monkey of data) {
   const newMonkey = {}
-
   const monkeyProps = monkey.split('\n')
-
   const monkeyNum = Number(monkeyProps[0].match(/\d+/g))
-  const items = monkeyProps[1].match(/\d+/g).map(item => Number(item))
-  const operation = monkeyProps[2].split('new = ')[1]
-  const testDivisibleBy = Number(monkeyProps[3].match(/\d+/g))
-  const testTrueThrowTo = Number(monkeyProps[4].match(/\d+/g))
-  const testFalseThrowTo = Number(monkeyProps[5].match(/\d+/g))
 
   newMonkey['monkey' + monkeyNum] = {
-    items: items,
-    operation: operation,
-    testDivisibleBy: testDivisibleBy,
-    testTrue: testTrueThrowTo,
-    testFalse: testFalseThrowTo,
+    items: monkeyProps[1].match(/\d+/g).map(item => Number(item)),
+    operation: monkeyProps[2].split('new = ')[1],
+    testDivisibleBy: Number(monkeyProps[3].match(/\d+/g)),
+    testTrue: Number(monkeyProps[4].match(/\d+/g)),
+    testFalse: Number(monkeyProps[5].match(/\d+/g)),
     itemsInspected: 0,
   }
 
@@ -39,6 +32,8 @@ for (let round = 1; round <= ROUNDS; round++) {
     const currentMonkey = monkeys[monkey]
     const items = currentMonkey.items
     const testDivisor = currentMonkey.testDivisibleBy
+    const trueDestination = currentMonkey.testTrue
+    const falseDestination = currentMonkey.testFalse
 
     // if monkey has no items it's turn ends
     while (items.length > 0) {
@@ -48,14 +43,12 @@ for (let round = 1; round <= ROUNDS; round++) {
       const isDivisibleByTestDivisor = operationResult % testDivisor === 0
 
       if (isDivisibleByTestDivisor) {
-        const destination = currentMonkey.testTrue
-        items.shift()
-        monkeys['monkey' + destination].items.push(operationResult)
+        monkeys['monkey' + trueDestination].items.push(operationResult)
       } else {
-        const destination = currentMonkey.testFalse
-        items.shift()
-        monkeys['monkey' + destination].items.push(operationResult)
+        monkeys['monkey' + falseDestination].items.push(operationResult)
       }
+
+      items.shift()
 
       // increase number of inspected items
       currentMonkey.itemsInspected++
